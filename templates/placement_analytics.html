@@ -1,0 +1,686 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Placement Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analytics-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        color: var(--white);
+        padding: var(--spacing-xl) 0;
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .analytics-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        padding: var(--spacing-lg);
+        transition: all 0.3s ease;
+    }
+    
+    .analytics-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+    
+    .metric-card {
+        text-align: center;
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .metric-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .metric-label {
+        color: var(--muted-text);
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .chart-container {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+        padding-bottom: var(--spacing-md);
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .chart-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark-text);
+    }
+    
+    .chart-content {
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+    
+    .chart-placeholder {
+        text-align: center;
+        color: var(--muted-text);
+    }
+    
+    .chart-placeholder-icon {
+        font-size: 3rem;
+        margin-bottom: var(--spacing-md);
+        opacity: 0.5;
+    }
+    
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background-color: var(--gray-200);
+        border-radius: 4px;
+        overflow: hidden;
+        margin: var(--spacing-sm) 0;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+        transition: width 0.3s ease;
+    }
+    
+    .top-jobs-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .top-jobs-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-md);
+        border-bottom: 1px solid var(--gray-100);
+        transition: background-color 0.2s ease;
+    }
+    
+    .top-jobs-item:hover {
+        background-color: var(--gray-50);
+    }
+    
+    .top-jobs-item:last-child {
+        border-bottom: none;
+    }
+    
+    .job-info {
+        flex: 1;
+    }
+    
+    .job-title {
+        font-weight: 600;
+        color: var(--dark-text);
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .job-company {
+        color: var(--muted-text);
+        font-size: 0.875rem;
+    }
+    
+    .job-stats {
+        text-align: right;
+    }
+    
+    .job-applications {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .job-views {
+        color: var(--muted-text);
+        font-size: 0.75rem;
+    }
+    
+    .status-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: var(--spacing-xs);
+    }
+    
+    .status-active { background-color: #10B981; }
+    .status-draft { background-color: #F59E0B; }
+    .status-closed { background-color: #EF4444; }
+    
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: var(--spacing-3xl);
+    }
+    
+    .error-message {
+        text-align: center;
+        color: var(--primary-color);
+        padding: var(--spacing-xl);
+    }
+    
+    .refresh-btn {
+        background: var(--primary-color);
+        color: var(--white);
+        border: none;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+    
+    .refresh-btn:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+    }
+    
+    @media (max-width: 768px) {
+        .analytics-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .chart-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Dashboard Navigation -->
+    <div class="dashboard-nav" style="background-color: var(--white); padding: var(--spacing-lg); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: var(--spacing-xl);">
+        <ul class="nav-tabs" style="display: flex; gap: var(--spacing-md); list-style: none; margin: 0; padding: 0;">
+            <li><a href="{{ url_for('placement_dashboard') }}" class="nav-tab" style="padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--radius-md); background-color: var(--gray-100); color: var(--muted-text); text-decoration: none; font-weight: 500; transition: all 0.2s ease;">Overview</a></li>
+            <li><a href="{{ url_for('placement_jobs') }}" class="nav-tab" style="padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--radius-md); background-color: var(--gray-100); color: var(--muted-text); text-decoration: none; font-weight: 500; transition: all 0.2s ease;">Manage Jobs</a></li>
+            <li><a href="{{ url_for('placement_applications') }}" class="nav-tab" style="padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--radius-md); background-color: var(--gray-100); color: var(--muted-text); text-decoration: none; font-weight: 500; transition: all 0.2s ease;">Applications</a></li>
+            <li><a href="{{ url_for('placement_analytics') }}" class="nav-tab active" style="padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--radius-md); background-color: var(--primary-color); color: var(--white); text-decoration: none; font-weight: 500; transition: all 0.2s ease;">Analytics</a></li>
+        </ul>
+    </div>
+    
+    <!-- Analytics Header -->
+    <div class="analytics-header">
+        <div class="text-center">
+            <h1>Job Analytics Dashboard</h1>
+            <p style="color: var(--white);">Comprehensive insights into your job postings and applications</p>
+        </div>
+    </div>
+    
+    <!-- Key Metrics -->
+    <div class="analytics-grid">
+        <div class="analytics-card metric-card">
+            <div class="metric-number" id="total-jobs">-</div>
+            <div class="metric-label">Total Jobs</div>
+        </div>
+        
+        <div class="analytics-card metric-card">
+            <div class="metric-number" id="total-applications">-</div>
+            <div class="metric-label">Total Applications</div>
+        </div>
+        
+        <div class="analytics-card metric-card">
+            <div class="metric-number" id="active-jobs">-</div>
+            <div class="metric-label">Active Jobs</div>
+        </div>
+        
+        <div class="analytics-card metric-card">
+            <div class="metric-number" id="avg-applications">-</div>
+            <div class="metric-label">Avg Applications/Job</div>
+        </div>
+    </div>
+    
+    <!-- Charts Row -->
+    <div class="analytics-grid">
+        <!-- Job Status Distribution -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">Job Status Distribution</h3>
+                <button class="refresh-btn" onclick="loadAnalytics()">Refresh</button>
+            </div>
+            <div class="chart-content" id="status-chart">
+                <div class="loading-spinner">
+                    <div class="loading"></div>
+                    <span style="margin-left: var(--spacing-md);">Loading...</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Applications Over Time -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">Applications Over Time</h3>
+                <button class="refresh-btn" onclick="loadAnalytics()">Refresh</button>
+            </div>
+            <div class="chart-content" id="timeline-chart">
+                <div class="loading-spinner">
+                    <div class="loading"></div>
+                    <span style="margin-left: var(--spacing-md);">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Performing Jobs -->
+    <div class="chart-container">
+        <div class="chart-header">
+            <h3 class="chart-title">Top Performing Jobs</h3>
+            <button class="refresh-btn" onclick="loadAnalytics()">Refresh</button>
+        </div>
+        <div class="chart-content" id="top-jobs">
+            <div class="loading-spinner">
+                <div class="loading"></div>
+                <span style="margin-left: var(--spacing-md);">Loading...</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Application Quality Metrics -->
+    <div class="analytics-grid">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">Application Quality Distribution</h3>
+                <button class="refresh-btn" onclick="loadAnalytics()">Refresh</button>
+            </div>
+            <div class="chart-content" id="quality-chart">
+                <div class="loading-spinner">
+                    <div class="loading"></div>
+                    <span style="margin-left: var(--spacing-md);">Loading...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">Skills in Demand</h3>
+                <button class="refresh-btn" onclick="loadAnalytics()">Refresh</button>
+            </div>
+            <div class="chart-content" id="skills-chart">
+                <div class="loading-spinner">
+                    <div class="loading"></div>
+                    <span style="margin-left: var(--spacing-md);">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/supabase.js') }}"></script>
+<script>
+// Analytics Dashboard JavaScript
+let analyticsData = {};
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadAnalytics();
+});
+
+// Load all analytics data
+async function loadAnalytics() {
+    try {
+        showLoadingState();
+        
+        // Load jobs and applications data
+        const [jobsResponse, applicationsResponse] = await Promise.all([
+            fetch('/api/jobs'),
+            fetch('/api/applications')
+        ]);
+        
+        const jobsResult = await jobsResponse.json();
+        const applicationsResult = await applicationsResponse.json();
+        
+        if (jobsResult.ok && applicationsResult.ok) {
+            analyticsData = {
+                jobs: jobsResult.jobs || [],
+                applications: applicationsResult.applications || []
+            };
+            
+            renderAnalytics();
+        } else {
+            showError('Failed to load analytics data');
+        }
+    } catch (error) {
+        console.error('Error loading analytics:', error);
+        showError('Error loading analytics data');
+    }
+}
+
+// Render all analytics
+function renderAnalytics() {
+    renderKeyMetrics();
+    renderStatusChart();
+    renderTimelineChart();
+    renderTopJobs();
+    renderQualityChart();
+    renderSkillsChart();
+}
+
+// Render key metrics
+function renderKeyMetrics() {
+    const jobs = analyticsData.jobs;
+    const applications = analyticsData.applications;
+    
+    const totalJobs = jobs.length;
+    const totalApplications = applications.length;
+    const activeJobs = jobs.filter(job => job.status === 'active').length;
+    const avgApplications = totalJobs > 0 ? (totalApplications / totalJobs).toFixed(1) : 0;
+    
+    document.getElementById('total-jobs').textContent = totalJobs;
+    document.getElementById('total-applications').textContent = totalApplications;
+    document.getElementById('active-jobs').textContent = activeJobs;
+    document.getElementById('avg-applications').textContent = avgApplications;
+}
+
+// Render job status distribution chart
+function renderStatusChart() {
+    const jobs = analyticsData.jobs;
+    const statusCounts = {
+        active: jobs.filter(job => job.status === 'active').length,
+        draft: jobs.filter(job => job.status === 'draft').length,
+        closed: jobs.filter(job => job.status === 'closed').length
+    };
+    
+    const total = jobs.length;
+    const chartContent = document.getElementById('status-chart');
+    
+    if (total === 0) {
+        chartContent.innerHTML = `
+            <div class="chart-placeholder">
+                <div class="chart-placeholder-icon">📊</div>
+                <p>No jobs data available</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '<div style="width: 100%;">';
+    
+    Object.entries(statusCounts).forEach(([status, count]) => {
+        const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+        const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+        
+        html += `
+            <div style="margin-bottom: var(--spacing-md);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-xs);">
+                    <span style="display: flex; align-items: center;">
+                        <span class="status-indicator status-${status}"></span>
+                        ${statusLabel}
+                    </span>
+                    <span style="font-weight: 600;">${count} (${percentage}%)</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${percentage}%"></div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    chartContent.innerHTML = html;
+}
+
+// Render applications timeline chart
+function renderTimelineChart() {
+    const applications = analyticsData.applications;
+    const chartContent = document.getElementById('timeline-chart');
+    
+    if (applications.length === 0) {
+        chartContent.innerHTML = `
+            <div class="chart-placeholder">
+                <div class="chart-placeholder-icon">📈</div>
+                <p>No applications data available</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Group applications by date
+    const dateGroups = {};
+    applications.forEach(app => {
+        const date = new Date(app.created_at).toLocaleDateString();
+        dateGroups[date] = (dateGroups[date] || 0) + 1;
+    });
+    
+    const dates = Object.keys(dateGroups).sort();
+    const maxCount = Math.max(...Object.values(dateGroups));
+    
+    let html = '<div style="width: 100%;">';
+    
+    dates.slice(-7).forEach(date => { // Show last 7 days
+        const count = dateGroups[date];
+        const height = maxCount > 0 ? (count / maxCount) * 100 : 0;
+        
+        html += `
+            <div style="display: flex; align-items: end; margin-bottom: var(--spacing-sm);">
+                <div style="width: 60px; font-size: 0.75rem; color: var(--muted-text);">${date}</div>
+                <div style="flex: 1; display: flex; align-items: end; gap: 2px;">
+                    <div style="width: 100%; height: ${height}px; background: linear-gradient(180deg, var(--primary-color), var(--primary-hover)); border-radius: 2px 2px 0 0; min-height: 4px;"></div>
+                </div>
+                <div style="width: 30px; text-align: right; font-size: 0.75rem; font-weight: 600; color: var(--primary-color);">${count}</div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    chartContent.innerHTML = html;
+}
+
+// Render top performing jobs
+function renderTopJobs() {
+    const jobs = analyticsData.jobs;
+    const applications = analyticsData.applications;
+    
+    const chartContent = document.getElementById('top-jobs');
+    
+    if (jobs.length === 0) {
+        chartContent.innerHTML = `
+            <div class="chart-placeholder">
+                <div class="chart-placeholder-icon">🏆</div>
+                <p>No jobs data available</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Calculate applications per job
+    const jobStats = jobs.map(job => {
+        const jobApplications = applications.filter(app => app.job_id === job.id);
+        return {
+            ...job,
+            applications_count: jobApplications.length,
+            views_count: Math.floor(Math.random() * 100) + jobApplications.length // Mock views data
+        };
+    });
+    
+    // Sort by applications count
+    jobStats.sort((a, b) => b.applications_count - a.applications_count);
+    
+    let html = '<ul class="top-jobs-list">';
+    
+    jobStats.slice(0, 5).forEach(job => {
+        html += `
+            <li class="top-jobs-item">
+                <div class="job-info">
+                    <div class="job-title">${job.title}</div>
+                    <div class="job-company">${job.company}</div>
+                </div>
+                <div class="job-stats">
+                    <div class="job-applications">${job.applications_count} applications</div>
+                    <div class="job-views">${job.views_count} views</div>
+                </div>
+            </li>
+        `;
+    });
+    
+    html += '</ul>';
+    chartContent.innerHTML = html;
+}
+
+// Render application quality chart
+function renderQualityChart() {
+    const applications = analyticsData.applications;
+    const chartContent = document.getElementById('quality-chart');
+    
+    if (applications.length === 0) {
+        chartContent.innerHTML = `
+            <div class="chart-placeholder">
+                <div class="chart-placeholder-icon">⭐</div>
+                <p>No applications data available</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const qualityCounts = {
+        high: applications.filter(app => app.verdict === 'High').length,
+        medium: applications.filter(app => app.verdict === 'Medium').length,
+        low: applications.filter(app => app.verdict === 'Low' || !app.verdict).length
+    };
+    
+    const total = applications.length;
+    
+    let html = '<div style="width: 100%;">';
+    
+    Object.entries(qualityCounts).forEach(([quality, count]) => {
+        const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+        const qualityLabel = quality.charAt(0).toUpperCase() + quality.slice(1);
+        const color = quality === 'high' ? '#10B981' : quality === 'medium' ? '#F59E0B' : '#EF4444';
+        
+        html += `
+            <div style="margin-bottom: var(--spacing-md);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-xs);">
+                    <span style="display: flex; align-items: center;">
+                        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: ${color}; margin-right: var(--spacing-xs);"></span>
+                        ${qualityLabel} Quality
+                    </span>
+                    <span style="font-weight: 600;">${count} (${percentage}%)</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${percentage}%; background: ${color};"></div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    chartContent.innerHTML = html;
+}
+
+// Render skills in demand chart
+function renderSkillsChart() {
+    const applications = analyticsData.applications;
+    const chartContent = document.getElementById('skills-chart');
+    
+    if (applications.length === 0) {
+        chartContent.innerHTML = `
+            <div class="chart-placeholder">
+                <div class="chart-placeholder-icon">💼</div>
+                <p>No applications data available</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Extract skills from applications
+    const skillCounts = {};
+    applications.forEach(app => {
+        if (app.skills && Array.isArray(app.skills)) {
+            app.skills.forEach(skill => {
+                skillCounts[skill] = (skillCounts[skill] || 0) + 1;
+            });
+        }
+    });
+    
+    // Sort skills by count
+    const sortedSkills = Object.entries(skillCounts)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5);
+    
+    if (sortedSkills.length === 0) {
+        chartContent.innerHTML = `
+            <div class="chart-placeholder">
+                <div class="chart-placeholder-icon">💼</div>
+                <p>No skills data available</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const maxCount = Math.max(...sortedSkills.map(([,count]) => count));
+    
+    let html = '<div style="width: 100%;">';
+    
+    sortedSkills.forEach(([skill, count]) => {
+        const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+        
+        html += `
+            <div style="margin-bottom: var(--spacing-md);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-xs);">
+                    <span style="font-weight: 500;">${skill}</span>
+                    <span style="font-weight: 600; color: var(--primary-color);">${count}</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${percentage}%"></div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    chartContent.innerHTML = html;
+}
+
+// Show loading state
+function showLoadingState() {
+    const loadingElements = document.querySelectorAll('.chart-content');
+    loadingElements.forEach(element => {
+        element.innerHTML = `
+            <div class="loading-spinner">
+                <div class="loading"></div>
+                <span style="margin-left: var(--spacing-md);">Loading...</span>
+            </div>
+        `;
+    });
+}
+
+// Show error message
+function showError(message) {
+    const chartElements = document.querySelectorAll('.chart-content');
+    chartElements.forEach(element => {
+        element.innerHTML = `
+            <div class="error-message">
+                <p>${message}</p>
+            </div>
+        `;
+    });
+}
+</script>
+{% endblock %}

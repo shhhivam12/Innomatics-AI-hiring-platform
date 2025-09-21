@@ -1,0 +1,650 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - Hiring Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+    
+    .modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        background-color: var(--white);
+        padding: var(--spacing-xl);
+        border-radius: var(--radius-lg);
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+        padding-bottom: var(--spacing-md);
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--muted-text);
+    }
+    
+    .modal-body {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .modal-footer {
+        display: flex;
+        gap: var(--spacing-md);
+        justify-content: flex-end;
+        padding-top: var(--spacing-md);
+        border-top: 1px solid var(--gray-200);
+    }
+    
+    .job-description-detail {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .job-description-detail h4 {
+        color: var(--dark-text);
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: var(--spacing-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .job-description-detail p {
+        color: var(--muted-text);
+        font-size: 0.875rem;
+        line-height: 1.5;
+        margin-bottom: 0;
+    }
+    .search-filters {
+        background-color: var(--white);
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .filter-group {
+        display: flex;
+        gap: var(--spacing-md);
+        align-items: end;
+        flex-wrap: wrap;
+    }
+    
+    .filter-item {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .job-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: var(--spacing-lg);
+    }
+    
+    .no-jobs {
+        text-align: center;
+        padding: var(--spacing-3xl);
+        color: var(--muted-text);
+    }
+    
+    .no-jobs-icon {
+        font-size: 4rem;
+        margin-bottom: var(--spacing-lg);
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="container">
+        <h1>Student Dashboard</h1>
+        <p>Browse available job opportunities and apply to positions that match your skills and interests.</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Search and Filters -->
+    <div class="search-filters">
+        <div class="filter-group">
+            <div class="filter-item">
+                <label class="form-label" for="search-input">Search Jobs</label>
+                <input type="text" id="search-input" class="form-input" placeholder="Job title, company, or keywords...">
+            </div>
+            <div class="filter-item">
+                <label class="form-label" for="location-filter">Location</label>
+                <select id="location-filter" class="form-select">
+                    <option value="">All Locations</option>
+                    <option value="remote">Remote</option>
+                    <option value="hybrid">Hybrid</option>
+                    <option value="bangalore">Bangalore</option>
+                    <option value="mumbai">Mumbai</option>
+                    <option value="delhi">Delhi</option>
+                    <option value="pune">Pune</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label class="form-label" for="experience-filter">Experience Level</label>
+                <select id="experience-filter" class="form-select">
+                    <option value="">All Levels</option>
+                    <option value="intern">Intern</option>
+                    <option value="entry">Entry Level</option>
+                    <option value="mid">Mid Level</option>
+                    <option value="senior">Senior Level</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <button class="btn btn-primary" onclick="filterJobs()">Filter Jobs</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Listings -->
+    <div id="job-listings">
+        <div class="job-grid" id="job-grid">
+            <!-- Sample Job Cards (will be populated by JavaScript) -->
+            <div class="card job-card">
+                <div class="card-body">
+                    <div class="job-title">Software Engineer - Frontend</div>
+                    <div class="job-company">TechCorp Solutions</div>
+                    <div class="job-description">
+                        We are looking for a talented Frontend Developer to join our team. You will be responsible for building user-facing features and ensuring a great user experience.
+                    </div>
+                    <div class="job-meta">
+                        <span>📍 Bangalore</span>
+                        <span>💼 Full-time</span>
+                        <span>⭐ Entry Level</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="applyToJob('job-1')">Apply Now</button>
+                </div>
+            </div>
+
+            <div class="card job-card">
+                <div class="card-body">
+                    <div class="job-title">Data Science Intern</div>
+                    <div class="job-company">DataFlow Analytics</div>
+                    <div class="job-description">
+                        Join our data science team as an intern and work on exciting machine learning projects. Great opportunity to learn and grow in the field of data science.
+                    </div>
+                    <div class="job-meta">
+                        <span>📍 Remote</span>
+                        <span>💼 Internship</span>
+                        <span>⭐ Intern</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="applyToJob('job-2')">Apply Now</button>
+                </div>
+            </div>
+
+            <div class="card job-card">
+                <div class="card-body">
+                    <div class="job-title">Product Manager</div>
+                    <div class="job-company">InnovateTech</div>
+                    <div class="job-description">
+                        We're seeking a Product Manager to drive product strategy and work closely with engineering teams to deliver exceptional user experiences.
+                    </div>
+                    <div class="job-meta">
+                        <span>📍 Mumbai</span>
+                        <span>💼 Full-time</span>
+                        <span>⭐ Mid Level</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="applyToJob('job-3')">Apply Now</button>
+                </div>
+            </div>
+
+            <div class="card job-card">
+                <div class="card-body">
+                    <div class="job-title">UX/UI Designer</div>
+                    <div class="job-company">DesignStudio Pro</div>
+                    <div class="job-description">
+                        Create beautiful and intuitive user interfaces. Work with cross-functional teams to design products that users love.
+                    </div>
+                    <div class="job-meta">
+                        <span>📍 Pune</span>
+                        <span>💼 Full-time</span>
+                        <span>⭐ Entry Level</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="applyToJob('job-4')">Apply Now</button>
+                </div>
+            </div>
+
+            <div class="card job-card">
+                <div class="card-body">
+                    <div class="job-title">DevOps Engineer</div>
+                    <div class="job-company">CloudTech Systems</div>
+                    <div class="job-description">
+                        Help us build and maintain our cloud infrastructure. Experience with AWS, Docker, and Kubernetes preferred.
+                    </div>
+                    <div class="job-meta">
+                        <span>📍 Delhi</span>
+                        <span>💼 Full-time</span>
+                        <span>⭐ Mid Level</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="applyToJob('job-5')">Apply Now</button>
+                </div>
+            </div>
+
+            <div class="card job-card">
+                <div class="card-body">
+                    <div class="job-title">Marketing Intern</div>
+                    <div class="job-company">Growth Marketing Co.</div>
+                    <div class="job-description">
+                        Support our marketing team with content creation, social media management, and campaign execution.
+                    </div>
+                    <div class="job-meta">
+                        <span>📍 Hybrid</span>
+                        <span>💼 Internship</span>
+                        <span>⭐ Intern</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="applyToJob('job-6')">Apply Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Jobs Message (hidden by default) -->
+        <div class="no-jobs hidden" id="no-jobs">
+            <div class="no-jobs-icon">🔍</div>
+            <h3>No jobs found</h3>
+            <p>Try adjusting your search criteria or check back later for new opportunities.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Job Description Modal -->
+<div class="modal" id="job-description-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="job-description-title">Job Description</h3>
+            <button class="modal-close" onclick="closeJobDescriptionModal()">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div id="job-description-content">
+                <!-- Job description content will be loaded here -->
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeJobDescriptionModal()">Close</button>
+            <button class="btn btn-primary" id="apply-from-modal-btn" onclick="applyFromModal()">Apply Now</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/supabase.js') }}"></script>
+<script>
+// Student Dashboard JavaScript
+let allJobs = [];
+let filteredJobs = [];
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    loadJobs();
+    setupEventListeners();
+});
+
+// Setup event listeners
+function setupEventListeners() {
+    const searchInput = document.getElementById('search-input');
+    const locationFilter = document.getElementById('location-filter');
+    const experienceFilter = document.getElementById('experience-filter');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(filterJobs, 300));
+    }
+    
+    if (locationFilter) {
+        locationFilter.addEventListener('change', filterJobs);
+    }
+    
+    if (experienceFilter) {
+        experienceFilter.addEventListener('change', filterJobs);
+    }
+}
+
+// Load jobs from Supabase
+async function loadJobs() {
+    try {
+        // Show loading state
+        showLoadingState();
+        
+        // Call Supabase service
+        const result = await window.SupabaseServices.JobService.fetchJobs();
+        
+        if (result.success) {
+            allJobs = result.jobs || getSampleJobs();
+            filteredJobs = [...allJobs];
+            renderJobs();
+        } else {
+            console.error('Failed to load jobs:', result.error);
+            // Fallback to sample data
+            allJobs = getSampleJobs();
+            filteredJobs = [...allJobs];
+            renderJobs();
+        }
+    } catch (error) {
+        console.error('Error loading jobs:', error);
+        // Fallback to sample data
+        allJobs = getSampleJobs();
+        filteredJobs = [...allJobs];
+        renderJobs();
+    }
+}
+
+// Get sample jobs data
+function getSampleJobs() {
+    return [
+        {
+            id: 'job-1',
+            title: 'Software Engineer - Frontend',
+            company: 'TechCorp Solutions',
+            location: 'Bangalore',
+            type: 'Full-time',
+            level: 'Entry Level',
+            description: 'We are looking for a talented Frontend Developer to join our team. You will be responsible for building user-facing features and ensuring a great user experience.',
+            requirements: 'React, JavaScript, HTML/CSS, Git',
+            posted_date: '2024-01-15'
+        },
+        {
+            id: 'job-2',
+            title: 'Data Science Intern',
+            company: 'DataFlow Analytics',
+            location: 'Remote',
+            type: 'Internship',
+            level: 'Intern',
+            description: 'Join our data science team as an intern and work on exciting machine learning projects. Great opportunity to learn and grow in the field of data science.',
+            requirements: 'Python, Machine Learning, Statistics',
+            posted_date: '2024-01-14'
+        },
+        {
+            id: 'job-3',
+            title: 'Product Manager',
+            company: 'InnovateTech',
+            location: 'Mumbai',
+            type: 'Full-time',
+            level: 'Mid Level',
+            description: 'We\'re seeking a Product Manager to drive product strategy and work closely with engineering teams to deliver exceptional user experiences.',
+            requirements: 'Product Management, Agile, Analytics',
+            posted_date: '2024-01-13'
+        },
+        {
+            id: 'job-4',
+            title: 'UX/UI Designer',
+            company: 'DesignStudio Pro',
+            location: 'Pune',
+            type: 'Full-time',
+            level: 'Entry Level',
+            description: 'Create beautiful and intuitive user interfaces. Work with cross-functional teams to design products that users love.',
+            requirements: 'Figma, Adobe Creative Suite, User Research',
+            posted_date: '2024-01-12'
+        },
+        {
+            id: 'job-5',
+            title: 'DevOps Engineer',
+            company: 'CloudTech Systems',
+            location: 'Delhi',
+            type: 'Full-time',
+            level: 'Mid Level',
+            description: 'Help us build and maintain our cloud infrastructure. Experience with AWS, Docker, and Kubernetes preferred.',
+            requirements: 'AWS, Docker, Kubernetes, Linux',
+            posted_date: '2024-01-11'
+        },
+        {
+            id: 'job-6',
+            title: 'Marketing Intern',
+            company: 'Growth Marketing Co.',
+            location: 'Hybrid',
+            type: 'Internship',
+            level: 'Intern',
+            description: 'Support our marketing team with content creation, social media management, and campaign execution.',
+            requirements: 'Social Media, Content Creation, Analytics',
+            posted_date: '2024-01-10'
+        }
+    ];
+}
+
+// Filter jobs based on search criteria
+function filterJobs() {
+    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const locationFilter = document.getElementById('location-filter').value.toLowerCase();
+    const experienceFilter = document.getElementById('experience-filter').value.toLowerCase();
+    
+    filteredJobs = allJobs.filter(job => {
+        const matchesSearch = !searchTerm || 
+            job.title.toLowerCase().includes(searchTerm) ||
+            job.company.toLowerCase().includes(searchTerm) ||
+            job.description.toLowerCase().includes(searchTerm);
+        
+        const matchesLocation = !locationFilter || 
+            job.location.toLowerCase().includes(locationFilter);
+        
+        const matchesExperience = !experienceFilter || 
+            job.level.toLowerCase().includes(experienceFilter);
+        
+        return matchesSearch && matchesLocation && matchesExperience;
+    });
+    
+    renderJobs();
+}
+
+// Render jobs to the page
+function renderJobs() {
+    const jobGrid = document.getElementById('job-grid');
+    const noJobsMessage = document.getElementById('no-jobs');
+    
+    if (filteredJobs.length === 0) {
+        jobGrid.style.display = 'none';
+        noJobsMessage.classList.remove('hidden');
+    } else {
+        jobGrid.style.display = 'grid';
+        noJobsMessage.classList.add('hidden');
+        
+        jobGrid.innerHTML = filteredJobs.map(job => `
+            <div class="card job-card">
+                <div class="card-body">
+                    <div class="job-title">${job.title}</div>
+                    <div class="job-company">${job.company}</div>
+                    <div class="job-description">${job.description}</div>
+                    <div class="job-meta">
+                        <span>📍 ${job.location}</span>
+                        <span>💼 ${job.type}</span>
+                        <span>⭐ ${job.level}</span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="btn btn-secondary" onclick="viewJobDescription('${job.id}')">View Description</button>
+                        <button class="btn btn-primary" onclick="applyToJob('${job.id}')">Apply Now</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+// Show loading state
+function showLoadingState() {
+    const jobGrid = document.getElementById('job-grid');
+    jobGrid.innerHTML = `
+        <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+            <div class="loading"></div>
+            <p style="margin-top: 1rem;">Loading jobs...</p>
+        </div>
+    `;
+}
+
+// Apply to a job
+function applyToJob(jobId) {
+    // Redirect to application form
+    window.location.href = `/apply/${jobId}`;
+}
+
+// View job description
+async function viewJobDescription(jobId) {
+    if (!jobId) {
+        window.HiringPortal.showAlert('Invalid job ID', 'error');
+        return;
+    }
+    
+    try {
+        // Show loading state
+        const originalText = event.target.textContent;
+        event.target.textContent = 'Loading...';
+        event.target.disabled = true;
+        
+        const response = await fetch(`/api/jobs/${jobId}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.ok && result.job) {
+            const job = result.job;
+            
+            // Update modal title
+            document.getElementById('job-description-title').textContent = `${job.title || 'Job'} - ${job.company || 'Company'}`;
+            
+            // Update modal content
+            const content = document.getElementById('job-description-content');
+            content.innerHTML = `
+                <div class="job-description-detail">
+                    <h4>Company</h4>
+                    <p>${job.company || 'Not specified'}</p>
+                </div>
+                
+                <div class="job-description-detail">
+                    <h4>Location</h4>
+                    <p>${job.location || 'Not specified'}</p>
+                </div>
+                
+                <div class="job-description-detail">
+                    <h4>Job Type</h4>
+                    <p>${job.type || 'Not specified'} • ${job.level || 'Not specified'}</p>
+                </div>
+                
+                ${job.salary ? `
+                <div class="job-description-detail">
+                    <h4>Salary</h4>
+                    <p>${job.salary}</p>
+                </div>
+                ` : ''}
+                
+                <div class="job-description-detail">
+                    <h4>Description</h4>
+                    <p>${job.description || 'No description available'}</p>
+                </div>
+                
+                ${job.requirements ? `
+                <div class="job-description-detail">
+                    <h4>Requirements</h4>
+                    <p>${job.requirements}</p>
+                </div>
+                ` : ''}
+                
+                ${job.benefits ? `
+                <div class="job-description-detail">
+                    <h4>Benefits</h4>
+                    <p>${job.benefits}</p>
+                </div>
+                ` : ''}
+                
+                ${job.deadline ? `
+                <div class="job-description-detail">
+                    <h4>Application Deadline</h4>
+                    <p>${new Date(job.deadline).toLocaleDateString()}</p>
+                </div>
+                ` : ''}
+                
+                ${job.jd_pdf_signed_url ? `
+                <div class="job-description-detail">
+                    <h4>Job Description PDF</h4>
+                    <p><a href="${job.jd_pdf_signed_url}" target="_blank" class="btn btn-sm btn-secondary">View PDF</a></p>
+                </div>
+                ` : ''}
+            `;
+            
+            // Set the job ID for the apply button
+            document.getElementById('apply-from-modal-btn').setAttribute('data-job-id', jobId);
+            
+            // Show modal
+            document.getElementById('job-description-modal').classList.add('show');
+        } else {
+            window.HiringPortal.showAlert(result.error || 'Failed to load job description', 'error');
+        }
+    } catch (error) {
+        console.error('Error loading job description:', error);
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            window.HiringPortal.showAlert('Network error. Please check your connection and try again.', 'error');
+        } else {
+            window.HiringPortal.showAlert('Error loading job description. Please try again.', 'error');
+        }
+    } finally {
+        // Restore button state
+        if (event.target) {
+            event.target.textContent = originalText;
+            event.target.disabled = false;
+        }
+    }
+}
+
+// Close job description modal
+function closeJobDescriptionModal() {
+    document.getElementById('job-description-modal').classList.remove('show');
+}
+
+// Apply from modal
+function applyFromModal() {
+    const jobId = document.getElementById('apply-from-modal-btn').getAttribute('data-job-id');
+    closeJobDescriptionModal();
+    applyToJob(jobId);
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const jobModal = document.getElementById('job-description-modal');
+    if (e.target === jobModal) {
+        closeJobDescriptionModal();
+    }
+});
+
+// Utility function for debouncing
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+</script>
+{% endblock %}

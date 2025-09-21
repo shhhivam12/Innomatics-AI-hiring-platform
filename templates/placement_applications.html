@@ -1,0 +1,790 @@
+{% extends "base.html" %}
+
+{% block title %}Applications - Placement Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .filters-section {
+        background-color: var(--white);
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .filter-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--spacing-md);
+        align-items: end;
+    }
+    
+    .nlp-query-section {
+        background-color: var(--primary-light);
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--spacing-xl);
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .nlp-query-input {
+        display: flex;
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .nlp-query-input input {
+        flex: 1;
+    }
+    
+    .query-examples {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+    }
+    
+    .query-example {
+        background-color: var(--white);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .query-example:hover {
+        background-color: var(--primary-color);
+        color: var(--white);
+    }
+    
+    .applications-grid {
+        display: grid;
+        gap: var(--spacing-lg);
+    }
+    
+    .application-card {
+        background-color: var(--white);
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border-left: 4px solid var(--gray-300);
+        transition: all 0.2s ease;
+    }
+    
+    .application-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+    }
+    
+    .application-card.high-relevance {
+        border-left-color: #10B981;
+    }
+    
+    .application-card.medium-relevance {
+        border-left-color: #F59E0B;
+    }
+    
+    .application-card.low-relevance {
+        border-left-color: #EF4444;
+    }
+    
+    .application-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .candidate-info h3 {
+        color: var(--dark-text);
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .candidate-meta {
+        color: var(--muted-text);
+        font-size: 0.875rem;
+    }
+    
+    .relevance-badge {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .relevance-high {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    
+    .relevance-medium {
+        background-color: #FEF3C7;
+        color: #92400E;
+    }
+    
+    .relevance-low {
+        background-color: #FEE2E2;
+        color: #991B1B;
+    }
+    
+    .application-details {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .detail-section {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .detail-section h4 {
+        color: var(--dark-text);
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: var(--spacing-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .detail-content {
+        color: var(--muted-text);
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+    
+    .skills-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-xs);
+    }
+    
+    .skill-tag {
+        background-color: var(--gray-100);
+        color: var(--dark-text);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+    }
+    
+    .application-actions {
+        display: flex;
+        gap: var(--spacing-sm);
+        justify-content: flex-end;
+        padding-top: var(--spacing-md);
+        border-top: 1px solid var(--gray-200);
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+    
+    .modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        background-color: var(--white);
+        padding: var(--spacing-xl);
+        border-radius: var(--radius-lg);
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+        padding-bottom: var(--spacing-md);
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--muted-text);
+    }
+    
+    .no-applications {
+        text-align: center;
+        padding: var(--spacing-3xl);
+        color: var(--muted-text);
+    }
+    
+    .no-applications-icon {
+        font-size: 4rem;
+        margin-bottom: var(--spacing-lg);
+        opacity: 0.5;
+    }
+    
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: var(--spacing-3xl);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1>Applications Review</h1>
+            <p>Review and manage job applications with AI-powered insights</p>
+        </div>
+        <div>
+            <button class="btn btn-secondary" onclick="refreshApplications()">Refresh</button>
+        </div>
+    </div>
+    
+    <!-- NLP Query Section -->
+    <div class="nlp-query-section">
+        <h3 style="color: var(--primary-color); margin-bottom: var(--spacing-md);">🤖 AI Query Assistant</h3>
+        <p style="color: var(--muted-text); margin-bottom: var(--spacing-md);">
+            Ask questions about applications in natural language. Try queries like "Show me all high-relevance applications" or "Find candidates with Python skills".
+        </p>
+        
+        <div class="nlp-query-input">
+            <input type="text" id="nlp-query" class="form-input" placeholder="Ask a question about applications...">
+            <button class="btn btn-primary" onclick="executeNLPQuery()">Query</button>
+        </div>
+        
+        <div class="query-examples">
+            <span style="color: var(--muted-text); font-size: 0.75rem; margin-right: var(--spacing-sm);">Try:</span>
+            <span class="query-example" onclick="setQuery('Show me all high-relevance applications')">High-relevance applications</span>
+            <span class="query-example" onclick="setQuery('Find candidates with Python skills')">Python skills</span>
+            <span class="query-example" onclick="setQuery('Applications from last week')">Recent applications</span>
+            <span class="query-example" onclick="setQuery('Candidates with 3+ years experience')">Experienced candidates</span>
+        </div>
+        
+        <div id="nlp-results" style="margin-top: var(--spacing-lg); display: none;">
+            <!-- NLP query results will be displayed here -->
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filter-row">
+            <div class="form-group">
+                <label class="form-label" for="job-filter">Filter by Job</label>
+                <select id="job-filter" class="form-select">
+                    <option value="">All Jobs</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="relevance-filter">Relevance Level</label>
+                <select id="relevance-filter" class="form-select">
+                    <option value="">All Levels</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="status-filter">Status</label>
+                <select id="status-filter" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="reviewed">Reviewed</option>
+                    <option value="shortlisted">Shortlisted</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" onclick="filterApplications()">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Applications List -->
+    <div class="applications-grid" id="applications-grid">
+        <!-- Applications will be populated by JavaScript -->
+        <div class="loading-spinner">
+            <div class="loading"></div>
+            <span style="margin-left: var(--spacing-md);">Loading applications...</span>
+        </div>
+    </div>
+    
+    <!-- No Applications Message -->
+    <div class="no-applications hidden" id="no-applications">
+        <div class="no-applications-icon">📋</div>
+        <h3>No applications found</h3>
+        <p>Try adjusting your filters or check back later for new applications.</p>
+    </div>
+</div>
+
+<!-- Email Modal -->
+<div class="modal" id="email-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Send Email to Candidate</h3>
+            <button class="modal-close" onclick="closeEmailModal()">&times;</button>
+        </div>
+        
+        <form id="email-form">
+            <input type="hidden" id="email-application-id">
+            
+            <div class="form-group">
+                <label class="form-label" for="email-subject">Subject *</label>
+                <input type="text" id="email-subject" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="email-body">Message *</label>
+                <textarea id="email-body" class="form-textarea" rows="8" required placeholder="Write your message to the candidate..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="email-from">From (Alias)</label>
+                <input type="text" id="email-from" class="form-input" placeholder="e.g., HR Team, Placement Department">
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeEmailModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Send Email</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/supabase.js') }}"></script>
+<script>
+// Placement Applications JavaScript
+let allApplications = [];
+let allJobs = [];
+let currentFilters = {
+    job_id: '',
+    relevance: '',
+    status: ''
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadApplications();
+    loadJobs();
+    setupEventListeners();
+});
+
+// Setup event listeners
+function setupEventListeners() {
+    const nlpQuery = document.getElementById('nlp-query');
+    if (nlpQuery) {
+        nlpQuery.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                executeNLPQuery();
+            }
+        });
+    }
+    
+    // Email form submission
+    const emailForm = document.getElementById('email-form');
+    if (emailForm) {
+        emailForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            sendEmail();
+        });
+    }
+}
+
+// Load applications from API
+async function loadApplications() {
+    try {
+        const response = await fetch('/api/applications');
+        const result = await response.json();
+        
+        if (result.ok) {
+            allApplications = result.applications || [];
+            renderApplications();
+        } else {
+            console.error('Failed to load applications:', result.error);
+            showError('Failed to load applications');
+        }
+    } catch (error) {
+        console.error('Error loading applications:', error);
+        showError('Error loading applications');
+    }
+}
+
+// Load jobs for filter dropdown
+async function loadJobs() {
+    try {
+        const response = await fetch('/api/jobs');
+        const result = await response.json();
+        
+        if (result.ok) {
+            allJobs = result.jobs || [];
+            populateJobFilter();
+        }
+    } catch (error) {
+        console.error('Error loading jobs:', error);
+    }
+}
+
+// Populate job filter dropdown
+function populateJobFilter() {
+    const jobFilter = document.getElementById('job-filter');
+    if (!jobFilter) return;
+    
+    jobFilter.innerHTML = '<option value="">All Jobs</option>' +
+        allJobs.map(job => `<option value="${job.id}">${job.title} - ${job.company}</option>`).join('');
+}
+
+// Render applications
+function renderApplications() {
+    const applicationsGrid = document.getElementById('applications-grid');
+    const noApplications = document.getElementById('no-applications');
+    
+    const filteredApplications = getFilteredApplications();
+    
+    if (filteredApplications.length === 0) {
+        applicationsGrid.style.display = 'none';
+        noApplications.classList.remove('hidden');
+        return;
+    }
+    
+    applicationsGrid.style.display = 'grid';
+    noApplications.classList.add('hidden');
+    
+    applicationsGrid.innerHTML = filteredApplications.map(app => {
+        const student = app.students || {};
+        const job = app.jobs || {};
+        return `
+        <div class="application-card ${getRelevanceClass(app.verdict)}">
+            <div class="application-header">
+                <div class="candidate-info">
+                    <h3>${student.full_name || 'Unknown Candidate'}</h3>
+                    <div class="candidate-meta">
+                        📧 ${student.email || 'N/A'} | 📱 ${student.phone || 'N/A'} | 🏫 ${student.college || 'N/A'}
+                    </div>
+                </div>
+                <div class="relevance-badge relevance-${app.verdict?.toLowerCase() || 'low'}">
+                    ${app.verdict || 'Not Evaluated'} (${app.relevance_score || 0}%)
+                </div>
+            </div>
+            
+            <div class="application-details">
+                <div class="detail-section">
+                    <h4>Applied For</h4>
+                    <div class="detail-content">${app.applied_for || 'N/A'}</div>
+                </div>
+                
+                ${app.summary ? `
+                <div class="detail-section">
+                    <h4>AI Summary</h4>
+                    <div class="detail-content">${app.summary}</div>
+                </div>
+                ` : ''}
+                
+                ${app.skills && app.skills.length > 0 ? `
+                <div class="detail-section">
+                    <h4>Skills</h4>
+                    <div class="skills-list">
+                        ${app.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${app.strong_points && app.strong_points.length > 0 ? `
+                <div class="detail-section">
+                    <h4>Strong Points</h4>
+                    <div class="detail-content">
+                        <ul style="margin: 0; padding-left: 1rem;">
+                            ${app.strong_points.map(point => `<li>${point}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${app.weak_points && app.weak_points.length > 0 ? `
+                <div class="detail-section">
+                    <h4>Areas for Improvement</h4>
+                    <div class="detail-content">
+                        <ul style="margin: 0; padding-left: 1rem;">
+                            ${app.weak_points.map(point => `<li>${point}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="application-actions">
+                <button class="btn btn-sm btn-secondary" onclick="viewResume('${app.id}')">View Resume</button>
+                <button class="btn btn-sm btn-primary" onclick="openEmailModal('${app.id}', '${student.email || 'N/A'}', '${student.full_name || 'Candidate'}')">Send Email</button>
+                <button class="btn btn-sm" onclick="updateApplicationStatus('${app.id}', 'shortlisted')" style="color: #10B981;">Shortlist</button>
+                <button class="btn btn-sm" onclick="updateApplicationStatus('${app.id}', 'rejected')" style="color: #EF4444;">Reject</button>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+// Get filtered applications
+function getFilteredApplications() {
+    return allApplications.filter(app => {
+        const matchesJob = !currentFilters.job_id || app.job_id === currentFilters.job_id;
+        const matchesRelevance = !currentFilters.relevance || app.verdict === currentFilters.relevance;
+        const matchesStatus = !currentFilters.status || app.status === currentFilters.status;
+        
+        return matchesJob && matchesRelevance && matchesStatus;
+    });
+}
+
+// Get relevance CSS class
+function getRelevanceClass(verdict) {
+    if (!verdict) return 'low-relevance';
+    return `${verdict.toLowerCase()}-relevance`;
+}
+
+// Filter applications
+function filterApplications() {
+    currentFilters.job_id = document.getElementById('job-filter').value;
+    currentFilters.relevance = document.getElementById('relevance-filter').value;
+    currentFilters.status = document.getElementById('status-filter').value;
+    
+    renderApplications();
+}
+
+// Execute NLP query
+async function executeNLPQuery() {
+    const query = document.getElementById('nlp-query').value.trim();
+    if (!query) return;
+    
+    const resultsDiv = document.getElementById('nlp-results');
+    resultsDiv.style.display = 'block';
+    resultsDiv.innerHTML = '<div class="loading-spinner"><div class="loading"></div><span style="margin-left: 1rem;">Processing query...</span></div>';
+    
+    try {
+        const response = await fetch('/api/nlpsql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                query: query,
+                user_id: 'placement-user' // In real app, get from session
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.ok) {
+            displayNLPResults(result);
+        } else {
+            resultsDiv.innerHTML = `<div class="alert alert-error">Error: ${result.error}</div>`;
+        }
+    } catch (error) {
+        console.error('Error executing NLP query:', error);
+        resultsDiv.innerHTML = '<div class="alert alert-error">Error executing query. Please try again.</div>';
+    }
+}
+
+// Display NLP query results
+function displayNLPResults(result) {
+    const resultsDiv = document.getElementById('nlp-results');
+    
+    if (!result.rows || result.rows.length === 0) {
+        resultsDiv.innerHTML = '<div class="alert alert-info">No results found for your query.</div>';
+        return;
+    }
+    
+    let html = '<div class="alert alert-success">Query executed successfully!</div>';
+    html += '<div style="background-color: var(--white); padding: 1rem; border-radius: var(--radius-md); margin-top: 1rem;">';
+    html += '<h4>Results:</h4>';
+    
+    if (result.columns && result.rows) {
+        html += '<table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">';
+        html += '<thead><tr>';
+        result.columns.forEach(col => {
+            html += `<th style="padding: 0.5rem; border: 1px solid var(--gray-200); background-color: var(--gray-50);">${col}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+        
+        result.rows.forEach(row => {
+            html += '<tr>';
+            result.columns.forEach((column, index) => {
+                html += `<td style="padding: 0.5rem; border: 1px solid var(--gray-200);">${row[index] || ''}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+    }
+    
+    html += '</div>';
+    resultsDiv.innerHTML = html;
+}
+
+// Set query example
+function setQuery(query) {
+    document.getElementById('nlp-query').value = query;
+}
+
+// View resume
+async function viewResume(applicationId) {
+    if (!applicationId) {
+        window.HiringPortal.showAlert('Invalid application ID', 'error');
+        return;
+    }
+    
+    try {
+        // Show loading state
+        const originalText = event.target.textContent;
+        event.target.textContent = 'Loading...';
+        event.target.disabled = true;
+        
+        // Get application details with signed URL
+        const response = await fetch(`/api/application/${applicationId}?signed=true`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.ok && result.application && result.application.resume_signed_url) {
+            // Open resume in new tab
+            const newWindow = window.open(result.application.resume_signed_url, '_blank');
+            
+            if (!newWindow) {
+                window.HiringPortal.showAlert('Please allow popups to view the resume', 'error');
+            }
+        } else if (result.ok && result.application && !result.application.resume_signed_url) {
+            window.HiringPortal.showAlert('Resume file not found or not accessible', 'error');
+        } else {
+            window.HiringPortal.showAlert(result.error || 'Resume not available or not found', 'error');
+        }
+    } catch (error) {
+        console.error('Error viewing resume:', error);
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            window.HiringPortal.showAlert('Network error. Please check your connection and try again.', 'error');
+        } else {
+            window.HiringPortal.showAlert('Error loading resume. Please try again.', 'error');
+        }
+    } finally {
+        // Restore button state
+        if (event.target) {
+            event.target.textContent = originalText;
+            event.target.disabled = false;
+        }
+    }
+}
+
+// Open email modal
+function openEmailModal(applicationId, email, candidateName) {
+    document.getElementById('email-application-id').value = applicationId;
+    document.getElementById('email-subject').value = `Application Update - ${candidateName}`;
+    document.getElementById('email-body').value = `Dear ${candidateName},\n\nThank you for your application. We would like to update you on the status of your application.\n\nBest regards,\nPlacement Department`;
+    document.getElementById('email-from').value = 'Placement Department';
+    document.getElementById('email-modal').classList.add('show');
+}
+
+// Close email modal
+function closeEmailModal() {
+    document.getElementById('email-modal').classList.remove('show');
+}
+
+// Send email
+async function sendEmail() {
+    const applicationId = document.getElementById('email-application-id').value;
+    const subject = document.getElementById('email-subject').value;
+    const body = document.getElementById('email-body').value;
+    const fromAlias = document.getElementById('email-from').value;
+    
+    try {
+        const response = await fetch('/api/email/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                application_id: applicationId,
+                subject: subject,
+                body: body,
+                from_alias: fromAlias
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.ok) {
+            window.HiringPortal.showAlert('Email sent successfully!', 'success');
+            closeEmailModal();
+        } else {
+            window.HiringPortal.showAlert(`Failed to send email: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error sending email:', error);
+        window.HiringPortal.showAlert('Error sending email. Please try again.', 'error');
+    }
+}
+
+// Update application status
+async function updateApplicationStatus(applicationId, status) {
+    if (!confirm(`Are you sure you want to ${status} this application?`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/applications/${applicationId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: status })
+        });
+        
+        const result = await response.json();
+        
+        if (result.ok) {
+            window.HiringPortal.showAlert(`Application ${status} successfully!`, 'success');
+            loadApplications(); // Refresh the list
+        } else {
+            window.HiringPortal.showAlert(`Failed to update application: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error updating application status:', error);
+        window.HiringPortal.showAlert('Error updating application. Please try again.', 'error');
+    }
+}
+
+// Refresh applications
+function refreshApplications() {
+    loadApplications();
+    window.HiringPortal.showAlert('Applications refreshed!', 'info');
+}
+
+// Show error message
+function showError(message) {
+    window.HiringPortal.showAlert(message, 'error');
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const emailModal = document.getElementById('email-modal');
+    if (e.target === emailModal) {
+        closeEmailModal();
+    }
+});
+</script>
+{% endblock %}

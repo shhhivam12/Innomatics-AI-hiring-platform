@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hiring Portal{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="{{ url_for('static', filename='img/hero-logo.png') }}" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-container">
+                <a href="{{ url_for('index') }}" class="navbar-brand" style="display: flex; align-items: center; gap: 10px;">
+                    <img src="{{ url_for('static', filename='img/hero-logo.png') }}" width="50px" alt="Innomatics Logo" class="logo">
+                    Innomatics Hiring Portal
+                </a>
+                
+                <!-- <ul class="navbar-nav" id="navbar-nav">
+                </ul> -->
+                
+                <!-- Portal Toggle -->
+                <div class="portal-toggle">
+                    <span class="toggle-label">Student</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="portal-toggle" onchange="switchPortal()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">Placement</span>
+                </div>
+                
+                <button class="navbar-toggle" id="navbar-toggle" aria-label="Toggle navigation">
+                    ☰
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Hiring Portal</h3>
+                    <p>Connecting students with opportunities and helping placement departments manage recruitment efficiently.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.5rem;"><a href="{{ url_for('student_dashboard') }}" style="color: var(--gray-300); text-decoration: none;">Student Portal</a></li>
+                        <li style="margin-bottom: 0.5rem;"><a href="{{ url_for('placement_dashboard') }}" style="color: var(--gray-300); text-decoration: none;">Placement Portal</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <p>For technical support or questions, please contact the placement department.</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Innomatics Hiring Portal. Made with ❤️ by <a href="https://www.linkedin.com/in/shivam-mahendru-61b4351b8/" target="_blank" style="color: var(--gray-300); text-decoration: none;">Shivam Mahendru</a> For Code4EdTech Hackathon</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

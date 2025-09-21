@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+
+{% block title %}Placement Dashboard - Hiring Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-nav {
+        background-color: var(--white);
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .nav-tabs {
+        display: flex;
+        gap: var(--spacing-md);
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .nav-tab {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        border-radius: var(--radius-md);
+        background-color: var(--gray-100);
+        color: var(--muted-text);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .nav-tab:hover {
+        background-color: var(--gray-200);
+        color: var(--dark-text);
+    }
+    
+    .nav-tab.active {
+        background-color: var(--primary-color);
+        color: var(--white);
+    }
+    
+    .dashboard-content {
+        background-color: var(--white);
+        padding: var(--spacing-xl);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .action-card {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        color: var(--white);
+        padding: var(--spacing-xl);
+        border-radius: var(--radius-lg);
+        text-align: center;
+        text-decoration: none;
+        transition: transform 0.2s ease;
+    }
+    
+    .action-card:hover {
+        transform: translateY(-2px);
+        color: var(--white);
+    }
+    
+    .action-icon {
+        font-size: 2.5rem;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .action-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .action-description {
+        opacity: 0.9;
+        font-size: 0.875rem;
+    }
+    
+    .stats-overview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .stat-card {
+        background-color: var(--white);
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        text-align: center;
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .stat-label {
+        color: var(--muted-text);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .recent-activity {
+        background-color: var(--gray-50);
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-lg);
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+        background-color: var(--white);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .activity-content {
+        flex: 1;
+    }
+    
+    .activity-title {
+        font-weight: 500;
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .activity-time {
+        color: var(--muted-text);
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="container">
+        <h1>Placement Dashboard</h1>
+        <p>Manage job postings, review applications, and track recruitment progress.</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Dashboard Navigation -->
+    <div class="dashboard-nav">
+        <ul class="nav-tabs">
+            <li><a href="{{ url_for('placement_dashboard') }}" class="nav-tab active">Overview</a></li>
+            <li><a href="{{ url_for('placement_jobs') }}" class="nav-tab">Manage Jobs</a></li>
+            <li><a href="{{ url_for('placement_applications') }}" class="nav-tab">Applications</a></li>
+            <li><a href="{{ url_for('placement_analytics') }}" class="nav-tab">Analytics</a></li>
+        </ul>
+    </div>
+    
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="{{ url_for('placement_jobs') }}" class="action-card">
+                <div class="action-icon">📝</div>
+                <div class="action-title">Post New Job</div>
+                <div class="action-description">Create and publish a new job posting</div>
+            </a>
+            
+            <a href="{{ url_for('placement_applications') }}" class="action-card">
+                <div class="action-icon">📋</div>
+                <div class="action-title">Review Applications</div>
+                <div class="action-description">View and manage submitted applications</div>
+            </a>
+            
+            <a href="{{ url_for('placement_jobs') }}" class="action-card">
+                <div class="action-icon">📊</div>
+                <div class="action-title">Job Analytics</div>
+                <div class="action-description">View job performance and statistics</div>
+            </a>
+        </div>
+        
+        <!-- Statistics Overview -->
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-number" id="total-jobs">0</div>
+                <div class="stat-label">Active Jobs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="total-applications">0</div>
+                <div class="stat-label">Total Applications</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pending-applications">0</div>
+                <div class="stat-label">Pending Review</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="this-month-applications">0</div>
+                <div class="stat-label">This Month</div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="recent-activity">
+            <h3 style="margin-bottom: var(--spacing-lg);">Recent Activity</h3>
+            <div id="recent-activity-list">
+                <!-- Activity items will be populated by JavaScript -->
+                <div class="activity-item">
+                    <div class="activity-icon">📝</div>
+                    <div class="activity-content">
+                        <div class="activity-title">New job posted: Software Engineer</div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">📄</div>
+                    <div class="activity-content">
+                        <div class="activity-title">5 new applications received</div>
+                        <div class="activity-time">4 hours ago</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">✅</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Application reviewed: John Doe</div>
+                        <div class="activity-time">1 day ago</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">📊</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Monthly report generated</div>
+                        <div class="activity-time">2 days ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/supabase.js') }}"></script>
+<script>
+// Placement Dashboard JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardData();
+});
+
+// Load dashboard data
+async function loadDashboardData() {
+    try {
+        // Load statistics
+        await loadStatistics();
+        
+        // Load recent activity
+        await loadRecentActivity();
+        
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        // Fallback to sample data
+        loadSampleData();
+    }
+}
+
+// Load statistics from Supabase
+async function loadStatistics() {
+    try {
+        // Fetch jobs count
+        const jobsResult = await window.SupabaseServices.JobService.fetchJobs();
+        const totalJobs = jobsResult.success ? jobsResult.jobs.length : 0;
+        
+        // Fetch applications count
+        const applicationsResult = await window.SupabaseServices.ApplicationService.fetchApplications();
+        const totalApplications = applicationsResult.success ? applicationsResult.applications.length : 0;
+        
+        // Calculate pending applications
+        const pendingApplications = applicationsResult.success ? 
+            applicationsResult.applications.filter(app => app.status === 'pending').length : 0;
+        
+        // Calculate this month's applications
+        const thisMonth = new Date().getMonth();
+        const thisYear = new Date().getFullYear();
+        const thisMonthApplications = applicationsResult.success ?
+            applicationsResult.applications.filter(app => {
+                const appDate = new Date(app.created_at);
+                return appDate.getMonth() === thisMonth && appDate.getFullYear() === thisYear;
+            }).length : 0;
+        
+        // Update UI
+        document.getElementById('total-jobs').textContent = totalJobs;
+        document.getElementById('total-applications').textContent = totalApplications;
+        document.getElementById('pending-applications').textContent = pendingApplications;
+        document.getElementById('this-month-applications').textContent = thisMonthApplications;
+        
+    } catch (error) {
+        console.error('Error loading statistics:', error);
+        loadSampleData();
+    }
+}
+
+// Load recent activity
+async function loadRecentActivity() {
+    try {
+        // This would typically fetch from a recent_activity table
+        // For now, we'll use sample data
+        const sampleActivity = [
+            {
+                icon: '📝',
+                title: 'New job posted: Software Engineer',
+                time: '2 hours ago'
+            },
+            {
+                icon: '📄',
+                title: '5 new applications received',
+                time: '4 hours ago'
+            },
+            {
+                icon: '✅',
+                title: 'Application reviewed: John Doe',
+                time: '1 day ago'
+            },
+            {
+                icon: '📊',
+                title: 'Monthly report generated',
+                time: '2 days ago'
+            }
+        ];
+        
+        const activityList = document.getElementById('recent-activity-list');
+        activityList.innerHTML = sampleActivity.map(activity => `
+            <div class="activity-item">
+                <div class="activity-icon">${activity.icon}</div>
+                <div class="activity-content">
+                    <div class="activity-title">${activity.title}</div>
+                    <div class="activity-time">${activity.time}</div>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading recent activity:', error);
+    }
+}
+
+// Load sample data as fallback
+function loadSampleData() {
+    document.getElementById('total-jobs').textContent = '12';
+    document.getElementById('total-applications').textContent = '156';
+    document.getElementById('pending-applications').textContent = '23';
+    document.getElementById('this-month-applications').textContent = '45';
+}
+</script>
+{% endblock %}

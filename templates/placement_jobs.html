@@ -1,0 +1,806 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Jobs - Placement Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .job-actions {
+        display: flex;
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .job-list {
+        display: grid;
+        gap: var(--spacing-lg);
+    }
+    
+    .job-item {
+        background-color: var(--white);
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border-left: 4px solid var(--primary-color);
+        transition: all 0.2s ease;
+    }
+    
+    .job-item:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+    }
+    
+    .job-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .job-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark-text);
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .job-company {
+        color: var(--primary-color);
+        font-weight: 500;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .job-meta {
+        display: flex;
+        gap: var(--spacing-md);
+        font-size: 0.875rem;
+        color: var(--muted-text);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .job-description {
+        color: var(--muted-text);
+        line-height: 1.5;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .job-stats {
+        display: flex;
+        gap: var(--spacing-lg);
+        font-size: 0.875rem;
+        color: var(--muted-text);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .job-actions-buttons {
+        display: flex;
+        gap: var(--spacing-sm);
+    }
+    
+    .status-badge {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+    
+    .status-active {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    
+    .status-draft {
+        background-color: #FEF3C7;
+        color: #92400E;
+    }
+    
+    .status-closed {
+        background-color: #FEE2E2;
+        color: #991B1B;
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+    
+    .modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        background-color: var(--white);
+        padding: var(--spacing-xl);
+        border-radius: var(--radius-lg);
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+        padding-bottom: var(--spacing-md);
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--muted-text);
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-lg);
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: var(--spacing-md);
+        justify-content: flex-end;
+        margin-top: var(--spacing-xl);
+        padding-top: var(--spacing-lg);
+        border-top: 1px solid var(--gray-200);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1>Manage Jobs</h1>
+            <p>Create, edit, and manage job postings</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateJobModal()">
+            + Post New Job
+        </button>
+    </div>
+    
+    <!-- Job Actions -->
+    <div class="job-actions">
+        <button class="btn btn-secondary" onclick="filterJobs('all')">All Jobs</button>
+        <button class="btn btn-secondary" onclick="filterJobs('active')">Active</button>
+        <button class="btn btn-secondary" onclick="filterJobs('draft')">Drafts</button>
+        <button class="btn btn-secondary" onclick="filterJobs('closed')">Closed</button>
+    </div>
+    
+    <!-- Job List -->
+    <div class="job-list" id="job-list">
+        <!-- Jobs will be populated by JavaScript -->
+        <div class="job-item">
+            <div class="job-header">
+                <div>
+                    <div class="job-title">Software Engineer - Frontend</div>
+                    <div class="job-company">TechCorp Solutions</div>
+                </div>
+                <span class="status-badge status-active">Active</span>
+            </div>
+            <div class="job-meta">
+                <span>📍 Bangalore</span>
+                <span>💼 Full-time</span>
+                <span>⭐ Entry Level</span>
+                <span>📅 Posted: Jan 15, 2024</span>
+            </div>
+            <div class="job-description">
+                We are looking for a talented Frontend Developer to join our team. You will be responsible for building user-facing features and ensuring a great user experience.
+            </div>
+            <div class="job-stats">
+                <span>📊 25 applications</span>
+                <span>👀 150 views</span>
+                <span>⏰ 5 days remaining</span>
+            </div>
+            <div class="job-actions-buttons">
+                <button class="btn btn-sm btn-primary" onclick="editJob('job-1')">Edit</button>
+                <button class="btn btn-sm btn-secondary" onclick="viewApplications('job-1')">View Applications</button>
+                <button class="btn btn-sm" onclick="closeJob('job-1')" style="color: var(--primary-color);">Close Job</button>
+            </div>
+        </div>
+        
+        <div class="job-item">
+            <div class="job-header">
+                <div>
+                    <div class="job-title">Data Science Intern</div>
+                    <div class="job-company">DataFlow Analytics</div>
+                </div>
+                <span class="status-badge status-active">Active</span>
+            </div>
+            <div class="job-meta">
+                <span>📍 Remote</span>
+                <span>💼 Internship</span>
+                <span>⭐ Intern</span>
+                <span>📅 Posted: Jan 14, 2024</span>
+            </div>
+            <div class="job-description">
+                Join our data science team as an intern and work on exciting machine learning projects. Great opportunity to learn and grow in the field of data science.
+            </div>
+            <div class="job-stats">
+                <span>📊 18 applications</span>
+                <span>👀 95 views</span>
+                <span>⏰ 12 days remaining</span>
+            </div>
+            <div class="job-actions-buttons">
+                <button class="btn btn-sm btn-primary" onclick="editJob('job-2')">Edit</button>
+                <button class="btn btn-sm btn-secondary" onclick="viewApplications('job-2')">View Applications</button>
+                <button class="btn btn-sm" onclick="closeJob('job-2')" style="color: var(--primary-color);">Close Job</button>
+            </div>
+        </div>
+        
+        <div class="job-item">
+            <div class="job-header">
+                <div>
+                    <div class="job-title">Product Manager</div>
+                    <div class="job-company">InnovateTech</div>
+                </div>
+                <span class="status-badge status-draft">Draft</span>
+            </div>
+            <div class="job-meta">
+                <span>📍 Mumbai</span>
+                <span>💼 Full-time</span>
+                <span>⭐ Mid Level</span>
+                <span>📅 Created: Jan 13, 2024</span>
+            </div>
+            <div class="job-description">
+                We're seeking a Product Manager to drive product strategy and work closely with engineering teams to deliver exceptional user experiences.
+            </div>
+            <div class="job-stats">
+                <span>📊 0 applications</span>
+                <span>👀 0 views</span>
+                <span>⏰ Not published</span>
+            </div>
+            <div class="job-actions-buttons">
+                <button class="btn btn-sm btn-primary" onclick="editJob('job-3')">Edit</button>
+                <button class="btn btn-sm btn-secondary" onclick="publishJob('job-3')">Publish</button>
+                <button class="btn btn-sm" onclick="deleteJob('job-3')" style="color: var(--primary-color);">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Job Modal -->
+<div class="modal" id="job-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">Create New Job</h3>
+            <button class="modal-close" onclick="closeJobModal()">&times;</button>
+        </div>
+        
+        <form id="job-form">
+            <input type="hidden" id="job-id" name="job_id">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="job-title-input">Job Title *</label>
+                    <input type="text" id="job-title-input" name="title" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="company">Company *</label>
+                    <input type="text" id="company" name="company" class="form-input" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="location">Location *</label>
+                    <input type="text" id="location" name="location" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="job-type">Job Type *</label>
+                    <select id="job-type" name="type" class="form-select" required>
+                        <option value="">Select Type</option>
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Internship">Internship</option>
+                        <option value="Contract">Contract</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="experience-level">Experience Level *</label>
+                    <select id="experience-level" name="level" class="form-select" required>
+                        <option value="">Select Level</option>
+                        <option value="Intern">Intern</option>
+                        <option value="Entry Level">Entry Level</option>
+                        <option value="Mid Level">Mid Level</option>
+                        <option value="Senior Level">Senior Level</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="salary">Salary Range</label>
+                    <input type="text" id="salary" name="salary" class="form-input" placeholder="e.g., ₹5-8 LPA">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="description">Job Description *</label>
+                <textarea id="description" name="description" class="form-textarea" rows="6" required placeholder="Describe the role, responsibilities, and what you're looking for in a candidate"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="requirements">Requirements *</label>
+                <textarea id="requirements" name="requirements" class="form-textarea" rows="4" required placeholder="List the required skills, qualifications, and experience"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="benefits">Benefits & Perks</label>
+                <textarea id="benefits" name="benefits" class="form-textarea" rows="3" placeholder="List any benefits, perks, or additional information"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="jd-pdf">Job Description PDF (Optional)</label>
+                <input type="file" id="jd-pdf" name="jd_pdf" class="form-input" accept=".pdf" onchange="handleJDFileChange(this)">
+                <small class="form-help">Upload a PDF file containing the detailed job description (max 10MB)</small>
+                <div id="jd-file-info" class="file-info" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background-color: var(--gray-100); border-radius: var(--radius-sm);">
+                    <span id="jd-file-name"></span>
+                    <button type="button" onclick="removeJDFile()" style="margin-left: 0.5rem; color: var(--primary-color); background: none; border: none; cursor: pointer;">Remove</button>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="application-deadline">Application Deadline</label>
+                    <input type="date" id="application-deadline" name="deadline" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="status">Status</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="draft">Draft</option>
+                        <option value="active">Active</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeJobModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="submit-job-btn">Create Job</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/supabase.js') }}"></script>
+<script>
+// Placement Jobs JavaScript
+let currentJobs = [];
+let currentFilter = 'all';
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadJobs();
+    setupFormValidation();
+});
+
+// Load jobs from Supabase
+async function loadJobs() {
+    try {
+        const result = await window.SupabaseServices.JobService.fetchJobs();
+        
+        if (result.success) {
+            currentJobs = result.jobs || getSampleJobs();
+        } else {
+            currentJobs = getSampleJobs();
+        }
+        
+        renderJobs();
+    } catch (error) {
+        console.error('Error loading jobs:', error);
+        currentJobs = getSampleJobs();
+        renderJobs();
+    }
+}
+
+// Get sample jobs data
+function getSampleJobs() {
+    return [
+        {
+            id: 'job-1',
+            title: 'Software Engineer - Frontend',
+            company: 'TechCorp Solutions',
+            location: 'Bangalore',
+            type: 'Full-time',
+            level: 'Entry Level',
+            description: 'We are looking for a talented Frontend Developer to join our team. You will be responsible for building user-facing features and ensuring a great user experience.',
+            requirements: 'React, JavaScript, HTML/CSS, Git',
+            benefits: 'Health insurance, flexible hours, remote work options',
+            salary: '₹6-10 LPA',
+            deadline: '2024-02-15',
+            status: 'active',
+            posted_date: '2024-01-15',
+            applications_count: 25,
+            views_count: 150
+        },
+        {
+            id: 'job-2',
+            title: 'Data Science Intern',
+            company: 'DataFlow Analytics',
+            location: 'Remote',
+            type: 'Internship',
+            level: 'Intern',
+            description: 'Join our data science team as an intern and work on exciting machine learning projects. Great opportunity to learn and grow in the field of data science.',
+            requirements: 'Python, Machine Learning, Statistics',
+            benefits: 'Mentorship, learning opportunities, stipend',
+            salary: '₹15,000/month',
+            deadline: '2024-02-28',
+            status: 'active',
+            posted_date: '2024-01-14',
+            applications_count: 18,
+            views_count: 95
+        },
+        {
+            id: 'job-3',
+            title: 'Product Manager',
+            company: 'InnovateTech',
+            location: 'Mumbai',
+            type: 'Full-time',
+            level: 'Mid Level',
+            description: 'We\'re seeking a Product Manager to drive product strategy and work closely with engineering teams to deliver exceptional user experiences.',
+            requirements: 'Product Management, Agile, Analytics',
+            benefits: 'Competitive salary, stock options, growth opportunities',
+            salary: '₹12-18 LPA',
+            deadline: '2024-03-01',
+            status: 'draft',
+            posted_date: '2024-01-13',
+            applications_count: 0,
+            views_count: 0
+        }
+    ];
+}
+
+// Render jobs to the page
+function renderJobs() {
+    const jobList = document.getElementById('job-list');
+    const filteredJobs = currentFilter === 'all' ? 
+        currentJobs : 
+        currentJobs.filter(job => job.status === currentFilter);
+    
+    if (filteredJobs.length === 0) {
+        jobList.innerHTML = `
+            <div style="text-align: center; padding: 3rem; color: var(--muted-text);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+                <h3>No jobs found</h3>
+                <p>Try adjusting your filter or create a new job posting.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    jobList.innerHTML = filteredJobs.map(job => `
+        <div class="job-item">
+            <div class="job-header">
+                <div>
+                    <div class="job-title">${job.title}</div>
+                    <div class="job-company">${job.company}</div>
+                </div>
+                <span class="status-badge status-${job.status}">${job.status}</span>
+            </div>
+            <div class="job-meta">
+                <span>📍 ${job.location}</span>
+                <span>💼 ${job.type}</span>
+                <span>⭐ ${job.level}</span>
+                <span>📅 Posted: ${formatDate(job.posted_date)}</span>
+            </div>
+            <div class="job-description">${job.description}</div>
+            <div class="job-stats">
+                <span>📊 ${job.applications_count} applications</span>
+                <span>👀 ${job.views_count} views</span>
+                <span>⏰ ${job.status === 'active' ? getDaysRemaining(job.deadline) + ' days remaining' : 'Not published'}</span>
+            </div>
+            <div class="job-actions-buttons">
+                <button class="btn btn-sm btn-primary" onclick="editJob('${job.id}')">Edit</button>
+                ${job.jd_pdf_url ? `<button class="btn btn-sm btn-secondary" onclick="downloadJD('${job.id}')">📄 Download JD</button>` : ''}
+                ${job.status === 'active' ? 
+                    `<button class="btn btn-sm btn-secondary" onclick="viewApplications('${job.id}')">View Applications</button>
+                     <button class="btn btn-sm" onclick="closeJob('${job.id}')" style="color: var(--primary-color);">Close Job</button>` :
+                    `<button class="btn btn-sm btn-secondary" onclick="publishJob('${job.id}')">Publish</button>
+                     <button class="btn btn-sm" onclick="deleteJob('${job.id}')" style="color: var(--primary-color);">Delete</button>`
+                }
+            </div>
+        </div>
+    `).join('');
+}
+
+// Filter jobs
+function filterJobs(filter) {
+    currentFilter = filter;
+    renderJobs();
+    
+    // Update button states
+    document.querySelectorAll('.job-actions .btn').forEach(btn => {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-secondary');
+    });
+    
+    event.target.classList.remove('btn-secondary');
+    event.target.classList.add('btn-primary');
+}
+
+// Open create job modal
+function openCreateJobModal() {
+    document.getElementById('modal-title').textContent = 'Create New Job';
+    document.getElementById('submit-job-btn').textContent = 'Create Job';
+    document.getElementById('job-form').reset();
+    document.getElementById('job-id').value = '';
+    document.getElementById('job-modal').classList.add('show');
+}
+
+// Close job modal
+function closeJobModal() {
+    document.getElementById('job-modal').classList.remove('show');
+}
+
+// Edit job
+function editJob(jobId) {
+    const job = currentJobs.find(j => j.id === jobId);
+    if (!job) return;
+    
+    document.getElementById('modal-title').textContent = 'Edit Job';
+    document.getElementById('submit-job-btn').textContent = 'Update Job';
+    
+    // Populate form with job data
+    document.getElementById('job-id').value = job.id;
+    document.getElementById('job-title-input').value = job.title;
+    document.getElementById('company').value = job.company;
+    document.getElementById('location').value = job.location;
+    document.getElementById('job-type').value = job.type;
+    document.getElementById('experience-level').value = job.level;
+    document.getElementById('salary').value = job.salary || '';
+    document.getElementById('description').value = job.description;
+    document.getElementById('requirements').value = job.requirements;
+    document.getElementById('benefits').value = job.benefits || '';
+    document.getElementById('application-deadline').value = job.deadline || '';
+    document.getElementById('status').value = job.status;
+    
+    document.getElementById('job-modal').classList.add('show');
+}
+
+// Setup form validation
+function setupFormValidation() {
+    const form = document.getElementById('job-form');
+    
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!window.HiringPortal.validateForm('job-form')) {
+            return;
+        }
+        
+        await saveJob();
+    });
+}
+
+// Handle JD file change
+function handleJDFileChange(input) {
+    const file = input.files[0];
+    const fileInfo = document.getElementById('jd-file-info');
+    const fileName = document.getElementById('jd-file-name');
+    
+    if (file) {
+        // Validate file type
+        if (file.type !== 'application/pdf') {
+            window.HiringPortal.showAlert('Please select a PDF file.', 'error');
+            input.value = '';
+            return;
+        }
+        
+        // Validate file size (10MB limit)
+        if (file.size > 10 * 1024 * 1024) {
+            window.HiringPortal.showAlert('File size must be less than 10MB.', 'error');
+            input.value = '';
+            return;
+        }
+        
+        fileName.textContent = file.name;
+        fileInfo.style.display = 'block';
+    } else {
+        fileInfo.style.display = 'none';
+    }
+}
+
+// Remove JD file
+function removeJDFile() {
+    const input = document.getElementById('jd-pdf');
+    const fileInfo = document.getElementById('jd-file-info');
+    
+    input.value = '';
+    fileInfo.style.display = 'none';
+}
+
+// Save job
+async function saveJob() {
+    const submitBtn = document.getElementById('submit-job-btn');
+    const originalText = submitBtn.innerHTML;
+    
+    try {
+        window.HiringPortal.showLoading(submitBtn);
+        
+        const formData = new FormData(document.getElementById('job-form'));
+        const jobId = formData.get('job_id');
+        
+        // For new jobs or when updating with file, use FormData
+        // For updates without file, use JSON
+        const hasFile = formData.get('jd_pdf') && formData.get('jd_pdf').size > 0;
+        
+        let result;
+        
+        if (jobId) {
+            if (hasFile) {
+                // Update existing job with file - use FormData
+                result = await window.SupabaseServices.JobService.updateJobWithFile(jobId, formData);
+            } else {
+                // Update existing job without file - use JSON
+                const jobData = {
+                    title: formData.get('title'),
+                    company: formData.get('company'),
+                    location: formData.get('location'),
+                    type: formData.get('type'),
+                    level: formData.get('level'),
+                    salary: formData.get('salary'),
+                    description: formData.get('description'),
+                    requirements: formData.get('requirements'),
+                    benefits: formData.get('benefits'),
+                    deadline: formData.get('deadline'),
+                    status: formData.get('status')
+                };
+                
+                result = await window.SupabaseServices.JobService.updateJob(jobId, jobData);
+            }
+        } else {
+            // Create new job - use FormData
+            result = await window.SupabaseServices.JobService.createJobWithFile(formData);
+        }
+        
+        if (result.success) {
+            window.HiringPortal.showAlert(
+                jobId ? 'Job updated successfully!' : 'Job created successfully!', 
+                'success'
+            );
+            
+            closeJobModal();
+            loadJobs();
+        } else {
+            throw new Error(result.error);
+        }
+        
+    } catch (error) {
+        console.error('Error saving job:', error);
+        window.HiringPortal.showAlert('Failed to save job. Please try again.', 'error');
+    } finally {
+        window.HiringPortal.hideLoading(submitBtn, originalText);
+    }
+}
+
+// Publish job
+async function publishJob(jobId) {
+    try {
+        const result = await window.SupabaseServices.JobService.updateJob(jobId, { status: 'active' });
+        
+        if (result.success) {
+            window.HiringPortal.showAlert('Job published successfully!', 'success');
+            loadJobs();
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error('Error publishing job:', error);
+        window.HiringPortal.showAlert('Failed to publish job. Please try again.', 'error');
+    }
+}
+
+// Close job
+async function closeJob(jobId) {
+    if (!confirm('Are you sure you want to close this job? This will stop accepting new applications.')) {
+        return;
+    }
+    
+    try {
+        const result = await window.SupabaseServices.JobService.updateJob(jobId, { status: 'closed' });
+        
+        if (result.success) {
+            window.HiringPortal.showAlert('Job closed successfully!', 'success');
+            loadJobs();
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error('Error closing job:', error);
+        window.HiringPortal.showAlert('Failed to close job. Please try again.', 'error');
+    }
+}
+
+// Delete job
+async function deleteJob(jobId) {
+    if (!confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const result = await window.SupabaseServices.JobService.deleteJob(jobId);
+        
+        if (result.success) {
+            window.HiringPortal.showAlert('Job deleted successfully!', 'success');
+            loadJobs();
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error('Error deleting job:', error);
+        window.HiringPortal.showAlert('Failed to delete job. Please try again.', 'error');
+    }
+}
+
+// View applications
+function viewApplications(jobId) {
+    window.location.href = `/placement/applications?job=${jobId}`;
+}
+
+// Download JD PDF
+async function downloadJD(jobId) {
+    try {
+        const result = await window.SupabaseServices.JobService.fetchJobById(jobId);
+        
+        if (result.success && result.job.jd_pdf_signed_url) {
+            // Open the signed URL in a new tab to download
+            window.open(result.job.jd_pdf_signed_url, '_blank');
+        } else {
+            window.HiringPortal.showAlert('JD PDF not available for this job.', 'error');
+        }
+    } catch (error) {
+        console.error('Error downloading JD:', error);
+        window.HiringPortal.showAlert('Failed to download JD. Please try again.', 'error');
+    }
+}
+
+// Utility functions
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-IN', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    });
+}
+
+function getDaysRemaining(deadline) {
+    const today = new Date();
+    const deadlineDate = new Date(deadline);
+    const diffTime = deadlineDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('job-modal');
+    if (e.target === modal) {
+        closeJobModal();
+    }
+});
+</script>
+{% endblock %}

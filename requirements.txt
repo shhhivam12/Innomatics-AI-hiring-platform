@@ -1,0 +1,10 @@
+Flask
+flask-cors
+groq
+numpy
+pdfplumber
+python-docx
+psycopg2-binary
+langchain
+supabase
+python-dotenv
