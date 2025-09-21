@@ -338,4 +338,5 @@ For support and questions:
 - [ ] Multi-language support
 - [ ] Advanced AI features
 #   I n n o m a t i c s - A I - h i r i n g - p l a t f o r m  
+ #   I n n o m a t i c s - A I - h i r i n g - p l a t f o r m  
  
