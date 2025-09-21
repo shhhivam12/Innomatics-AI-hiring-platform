@@ -1,119 +1,182 @@
-# Hiring Portal - AI-Powered Recruitment Platform
+<div align="center">
 
-A comprehensive hiring portal built with Flask, Supabase, and AI technologies for managing job applications, resume evaluation, and candidate communication.
+# 🚀 Infomatics AI Hiring Platform
 
-## Features
+**Intelligent Recruitment Made Simple**
 
-### For Students
-- Browse available job opportunities
-- Upload resumes and apply to jobs
-- Track application status
-- Receive email notifications
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-2.0+-green.svg)](https://flask.palletsprojects.com)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-orange.svg)](https://supabase.com)
+[![AI Powered](https://img.shields.io/badge/AI-Powered-purple.svg)](#)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-### For Placement Department
-- Create and manage job postings
-- Review applications with AI-powered insights
-- Natural language query interface for data analysis
-- Send emails to candidates
-- Track recruitment metrics
+*Revolutionizing campus recruitment with AI-powered resume analysis and intelligent job matching*
 
-### AI-Powered Features
-- Resume parsing and skill extraction
-- Job-resume matching with relevance scoring
-- Natural language to SQL queries
-- Automated email notifications
-- Candidate feedback generation
+[📖 Documentation](#-documentation) • [🚀 Quick Start](#-quick-start) • [🎯 Features](#-features) • [🔧 Setup](#-setup) • [📱 Demo](#-demo)
 
-## Technology Stack
+</div>
+
+---
+
+## 🌟 Overview
+
+The **Infomatics AI Hiring Platform** is a cutting-edge recruitment solution designed specifically for educational institutions. It combines the power of artificial intelligence with modern web technologies to streamline the entire hiring process, from job posting to candidate evaluation.
+
+### 🎯 What Makes It Special?
+
+- **🤖 AI-Powered Resume Analysis** - Automatically extract skills, experience, and qualifications
+- **📊 Intelligent Job Matching** - Smart relevance scoring and candidate ranking
+- **🗣️ Natural Language Queries** - Ask questions about your data in plain English
+- **📧 Automated Communication** - Seamless email notifications and updates
+- **📱 Mobile-First Design** - Responsive interface for all devices
+
+---
+
+## ✨ Features
+
+### 👨‍🎓 For Students
+<div align="center">
+
+| Feature | Description |
+|---------|-------------|
+| 🔍 **Job Discovery** | Browse and search through available opportunities |
+| 📄 **Resume Upload** | Easy PDF/DOCX resume submission |
+| 📈 **Application Tracking** | Real-time status updates |
+| 📧 **Email Notifications** | Stay informed about your applications |
+
+</div>
+
+### 🏢 For Placement Department
+<div align="center">
+
+| Feature | Description |
+|---------|-------------|
+| 📝 **Job Management** | Create, edit, and manage job postings |
+| 🤖 **AI Evaluation** | Automated resume analysis and scoring |
+| 📊 **Analytics Dashboard** | Comprehensive recruitment insights |
+| 🗣️ **NLP Queries** | Ask questions about your data naturally |
+| 📧 **Bulk Communication** | Send emails to multiple candidates |
+
+</div>
+
+### 🧠 AI-Powered Capabilities
+<div align="center">
+
+| Capability | Technology | Benefit |
+|------------|------------|---------|
+| **Resume Parsing** | PDFplumber + LLM | Extract structured data from resumes |
+| **Skill Matching** | Semantic Analysis | Match candidates to job requirements |
+| **Relevance Scoring** | ML Algorithms | Rank candidates by fit |
+| **Natural Language** | Groq/Gemini AI | Query data in plain English |
+| **Feedback Generation** | LLM Processing | Generate candidate insights |
+
+</div>
+
+---
+
+## 🛠️ Technology Stack
+
+<div align="center">
 
 ### Backend
-- **Flask** - Web framework
-- **Supabase** - Database and authentication
-- **LangChain/LangGraph** - AI orchestration
-- **Groq/Gemini** - Large Language Models
-- **Sentence Transformers** - Text embeddings
-- **PDFplumber** - Resume parsing
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+
+### AI & ML
+![Groq](https://img.shields.io/badge/Groq-AI-FF6B6B?style=for-the-badge)
+![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)
+![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)
 
 ### Frontend
-- **HTML/CSS/JavaScript** - Responsive web interface
-- **Design System** - Consistent UI components
-- **Mobile-first** - Responsive design
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
-## Installation
+</div>
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.10+
+- Python 3.10 or higher
 - Supabase account
 - Groq or Gemini API key
 - SMTP email configuration
 
-### Setup
+### 1️⃣ Clone & Install
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/infomatics-ai-hiring-platform.git
+cd infomatics-ai-hiring-platform
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd hiring-portal
-   ```
+# Install dependencies
+pip install -r requirements.txt
+```
 
-2. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 2️⃣ Environment Setup
+```bash
+# Copy environment template
+cp env.example .env
 
-3. **Configure environment variables**
-   ```bash
-   cp env.example .env
-   # Edit .env with your configuration
-   ```
+# Edit .env with your configuration
+nano .env
+```
 
-4. **Set up Supabase**
-   - Create a new Supabase project
-   - Run the SQL schema (see Database Schema section)
-   - Configure storage buckets
-   - Set up Row Level Security policies
+### 3️⃣ Database Configuration
+```bash
+# Set up Supabase database
+# 1. Create new Supabase project
+# 2. Run database_schema.sql
+# 3. Configure storage buckets
+# 4. Set up RLS policies
+```
 
-5. **Run the application**
-   ```bash
-   python backend/app.py
-   ```
+### 4️⃣ Run the Application
+```bash
+# Development mode
+python app.py
 
-## Configuration
+# Production mode
+gunicorn app:app
+```
+
+---
+
+## ⚙️ Configuration
 
 ### Environment Variables
-
 ```env
-# Flask Configuration
-FLASK_ENV=development
-FLASK_APP=backend/app.py
-SECRET_KEY=your-secret-key-here
-
-# Supabase Configuration
+# 🔐 Supabase Configuration
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key-here
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-# LLM Configuration
-GROQ_API_KEY=your-groq-api-key-here
-GEMINI_API_KEY=your-gemini-api-key-here
+# 🤖 AI Configuration
+GROQ_API_KEY=your-groq-api-key
+GEMINI_API_KEY=your-gemini-api-key
 LLM_PROVIDER=groq
-AI_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
 
-# Email Configuration
+# 📧 Email Configuration
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
+
+# 🔑 Flask Configuration
+SECRET_KEY=your-secret-key-here
 ```
 
-## Database Schema
+---
 
-### Supabase Tables
+## 📊 Database Schema
 
+### Core Tables
 ```sql
--- Students table
+-- 👨‍🎓 Students
 CREATE TABLE students (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES auth.users(id),
     full_name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     phone TEXT,
@@ -121,18 +184,21 @@ CREATE TABLE students (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Jobs table
+-- 💼 Jobs
 CREATE TABLE jobs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
-    description TEXT NOT NULL,
+    company TEXT NOT NULL,
     location TEXT NOT NULL,
-    department TEXT NOT NULL,
-    created_by UUID REFERENCES auth.users(id),
+    description TEXT NOT NULL,
+    requirements TEXT,
+    salary TEXT,
+    deadline DATE,
+    status TEXT DEFAULT 'active',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Applications table
+-- 📋 Applications
 CREATE TABLE applications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     student_id UUID REFERENCES students(id),
@@ -140,203 +206,167 @@ CREATE TABLE applications (
     resume_url TEXT,
     relevance_score INTEGER,
     verdict TEXT,
-    strong_points TEXT[],
-    weak_points TEXT[],
     skills TEXT[],
-    key_projects TEXT[],
-    certifications TEXT[],
     experience TEXT,
     summary TEXT,
-    college TEXT,
-    applied_for TEXT,
     status TEXT DEFAULT 'pending',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
--- AI Audit table
-CREATE TABLE ai_audit (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    application_id UUID REFERENCES applications(id),
-    raw_response JSONB,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
 ```
 
-### Storage Buckets
+---
 
-```sql
--- Create resumes bucket
-INSERT INTO storage.buckets (id, name, public) VALUES ('resumes', 'resumes', false);
+## 🔌 API Endpoints
 
--- Set up RLS policies for resumes bucket
-CREATE POLICY "Users can upload resumes" ON storage.objects
-FOR INSERT WITH CHECK (bucket_id = 'resumes');
-
-CREATE POLICY "Users can view resumes" ON storage.objects
-FOR SELECT USING (bucket_id = 'resumes');
+### Jobs Management
+```http
+POST   /api/jobs          # Create job posting
+GET    /api/jobs          # List jobs with filtering
+GET    /api/jobs/{id}     # Get specific job
+PUT    /api/jobs/{id}     # Update job
+DELETE /api/jobs/{id}     # Delete job
 ```
 
-## API Endpoints
-
-### Jobs API
-- `POST /api/jobs` - Create job posting
-- `GET /api/jobs` - List jobs with filtering
-- `GET /api/jobs/{id}` - Get specific job
-- `PUT /api/jobs/{id}` - Update job
-- `DELETE /api/jobs/{id}` - Delete job
-
-### Applications API
-- `POST /api/applications` - Submit application
-- `GET /api/applications` - List applications
-- `GET /api/applications/{id}` - Get specific application
-- `PATCH /api/applications/{id}` - Update application
-- `DELETE /api/applications/{id}` - Delete application
-
-### AI Evaluation API
-- `POST /api/evaluate` - Evaluate application
-- `POST /api/evaluate/batch` - Batch evaluation
-- `POST /api/evaluate/relevance` - Calculate relevance score
-- `POST /api/evaluate/feedback` - Generate feedback
-
-### NLP to SQL API
-- `POST /api/nlpsql` - Natural language queries
-- `POST /api/nlpsql/validate` - Validate SQL queries
-- `GET /api/nlpsql/schema` - Get database schema
-
-### Email API
-- `POST /api/email/send` - Send email
-- `POST /api/email/confirmation` - Send confirmation
-- `POST /api/email/status-update` - Send status update
-- `POST /api/email/interview-invitation` - Send interview invite
-- `POST /api/email/bulk` - Send bulk emails
-
-## AI Pipeline
-
-### Resume Evaluation Process
-
-1. **Text Extraction** - Extract text from PDF/DOC files
-2. **LLM Parsing** - Parse resume and job description
-3. **Skill Matching** - Hard match required skills
-4. **Semantic Matching** - Embed and compare text similarity
-5. **Relevance Scoring** - Combine hard and semantic scores
-6. **Feedback Generation** - Generate strong/weak points
-7. **Database Update** - Store evaluation results
-
-### NLP to SQL Safety
-
-- Only SELECT queries allowed
-- Validates table and column names
-- Prevents SQL injection
-- Uses parameterized queries
-- Logs all queries for audit
-
-## Security Features
-
-- Row Level Security (RLS) in Supabase
-- Input validation and sanitization
-- File type validation for uploads
-- SQL injection prevention
-- CORS configuration
-- Environment-based configuration
-
-## Development
-
-### Project Structure
-
-```
-hiring-portal/
-├── backend/
-│   ├── api/           # API endpoints
-│   ├── lib/           # Core libraries
-│   ├── app.py         # Main Flask app
-│   └── config.py      # Configuration
-├── templates/         # HTML templates
-├── static/           # CSS, JS, images
-├── requirements.txt  # Python dependencies
-└── README.md        # This file
+### Applications
+```http
+POST   /api/apply         # Submit application
+GET    /api/applications  # List applications
+GET    /api/application/{id} # Get application details
+PATCH  /api/applications/{id} # Update application
 ```
 
-### Running in Development
+### AI Features
+```http
+POST   /api/evaluate      # AI resume evaluation
+POST   /api/nlpsql        # Natural language to SQL
+POST   /api/email/send    # Send email notifications
+```
 
+---
+
+## 🤖 AI Pipeline
+
+<div align="center">
+
+```mermaid
+graph TD
+    A[📄 Resume Upload] --> B[🔍 Text Extraction]
+    B --> C[🧠 LLM Analysis]
+    C --> D[📊 Skill Matching]
+    D --> E[🎯 Relevance Scoring]
+    E --> F[📝 Feedback Generation]
+    F --> G[💾 Database Update]
+    G --> H[📧 Notification]
+```
+
+</div>
+
+### AI Evaluation Process
+1. **📄 Text Extraction** - Extract text from PDF/DOCX files
+2. **🧠 LLM Analysis** - Parse resume and job requirements
+3. **📊 Skill Matching** - Match candidate skills to job needs
+4. **🎯 Relevance Scoring** - Calculate compatibility score (0-100)
+5. **📝 Feedback Generation** - Generate strengths and weaknesses
+6. **💾 Database Update** - Store evaluation results
+7. **📧 Notification** - Send automated updates
+
+---
+
+## 🚀 Deployment
+
+### Vercel Deployment
 ```bash
-# Set environment
-export FLASK_ENV=development
+# 1. Push to GitHub
+git push origin main
 
-# Run with auto-reload
-python backend/app.py
+# 2. Connect to Vercel
+# 3. Set environment variables
+# 4. Deploy automatically
 ```
-
-### Testing
-
-```bash
-# Run tests
-pytest
-
-# Run with coverage
-pytest --cov=backend
-```
-
-## Deployment
-
-### Production Setup
-
-1. **Environment Configuration**
-   - Set `FLASK_ENV=production`
-   - Use production Supabase project
-   - Configure production SMTP settings
-
-2. **Database Setup**
-   - Run migration scripts
-   - Set up RLS policies
-   - Configure storage buckets
-
-3. **Server Deployment**
-   - Use WSGI server (Gunicorn)
-   - Set up reverse proxy (Nginx)
-   - Configure SSL certificates
 
 ### Docker Deployment
-
 ```dockerfile
 FROM python:3.10-slim
-
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-
 COPY . .
 EXPOSE 5000
-
-CMD ["python", "backend/app.py"]
+CMD ["python", "app.py"]
 ```
 
-## Contributing
+---
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
+## 📱 Screenshots
 
-## License
+<div align="center">
 
-This project is licensed under the MIT License.
+| Student Dashboard | Placement Dashboard | AI Analytics |
+|-------------------|-------------------|--------------|
+| ![Student View](https://via.placeholder.com/300x200/4CAF50/white?text=Student+Dashboard) | ![Placement View](https://via.placeholder.com/300x200/2196F3/white?text=Placement+Dashboard) | ![Analytics View](https://via.placeholder.com/300x200/FF9800/white?text=AI+Analytics) |
 
-## Support
+</div>
 
-For support and questions:
-- Create an issue in the repository
-- Check the API documentation at `/api/docs`
-- Review the configuration examples
+---
 
-## Roadmap
+## 🤝 Contributing
 
-- [ ] User authentication system
-- [ ] Advanced analytics dashboard
-- [ ] Interview scheduling integration
-- [ ] Mobile app development
-- [ ] Multi-language support
-- [ ] Advanced AI features
-#   I n n o m a t i c s - A I - h i r i n g - p l a t f o r m  
- #   I n n o m a t i c s - A I - h i r i n g - p l a t f o r m  
- 
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+### Development Setup
+```bash
+# Fork and clone
+git clone https://github.com/yourusername/infomatics-ai-hiring-platform.git
+
+# Create feature branch
+git checkout -b feature/amazing-feature
+
+# Make changes and commit
+git commit -m "Add amazing feature"
+
+# Push and create PR
+git push origin feature/amazing-feature
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- **Supabase** for the amazing backend infrastructure
+- **Groq** for lightning-fast AI inference
+- **Flask** for the robust web framework
+- **OpenAI** for the powerful language models
+
+---
+
+## 📞 Support
+
+<div align="center">
+
+| Support Channel | Description |
+|----------------|-------------|
+| 🐛 **Issues** | [GitHub Issues](https://github.com/yourusername/infomatics-ai-hiring-platform/issues) |
+| 💬 **Discussions** | [GitHub Discussions](https://github.com/yourusername/infomatics-ai-hiring-platform/discussions) |
+| 📧 **Email** | support@infomatics-hiring.com |
+| 📖 **Documentation** | [Full Documentation](https://docs.infomatics-hiring.com) |
+
+</div>
+
+---
+
+<div align="center">
+
+**⭐ Star this repository if you found it helpful!**
+
+Made with ❤️ by the Infomatics Team
+
+[![GitHub stars](https://img.shields.io/github/stars/yourusername/infomatics-ai-hiring-platform.svg?style=social&label=Star)](https://github.com/yourusername/infomatics-ai-hiring-platform)
+[![GitHub forks](https://img.shields.io/github/forks/yourusername/infomatics-ai-hiring-platform.svg?style=social&label=Fork)](https://github.com/yourusername/infomatics-ai-hiring-platform/fork)
+
+</div>
